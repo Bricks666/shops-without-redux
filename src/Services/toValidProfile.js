@@ -2,7 +2,7 @@ export const toValidProfile = (profile) => {
 	const validProfile = {
 		address: profile.Address,
 		balance: profile.balance,
-		fio: profile.FIO,
+		name: profile.FIO,
 		login: profile.login,
 		role: +profile.role,
 		isAdmin: profile.isAdmin,

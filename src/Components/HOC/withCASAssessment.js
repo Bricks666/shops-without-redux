@@ -1,13 +1,12 @@
-import { useContext } from "react";
 import { useCASAssessment } from "../../Hooks/useCASAssessment";
 import { Button } from "../Shared/Button/Button";
-import { Context } from "../Content/Content";
+import { useUserContext } from "../../Hooks/useUserContext";
 
 export const withCASAssessment = (Component) => {
 	return (props) => {
 		const [like, dislike] = useCASAssessment(props.shopAddress, props.id);
 
-		const { address } = useContext(Context);
+		const { address } = useUserContext();
 
 		return (
 			<Component {...props}>

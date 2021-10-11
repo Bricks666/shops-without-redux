@@ -1,22 +1,6 @@
 import { useProfile } from "../../Hooks/useProfile";
 import { Buttons } from "./Buttons/Buttons";
-
-const getStringRole = (role) => {
-	switch (role) {
-		case 1: {
-			return "Buyer";
-		}
-		case 2: {
-			return "Salesman";
-		}
-		case 3: {
-			return "Admin";
-		}
-		default: {
-			return "Guest";
-		}
-	}
-};
+import { getStringRole } from "../../Services/getStringRole";
 
 const parseProfileInfo = (profileInfo) => {
 	return Object.entries(profileInfo)

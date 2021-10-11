@@ -4,12 +4,7 @@ import { api } from "../API/api";
 export const useAccount = () => {
 	const [isUnlock, setUnlock] = useState(false);
 
-	const unlockAccount = async (evt) => {
-		evt.preventDefault();
-
-		const address = evt.target[0].value;
-		const password = evt.target[1].value;
-
+	const unlockAccount = async (address, password) => {
 		try {
 			await api.unlockAccount(address, password);
 
@@ -19,5 +14,14 @@ export const useAccount = () => {
 		}
 	};
 
-	return [isUnlock, unlockAccount];
+	const lockAccount = async () => {
+		try {
+			await api.lockAccount();
+			setUnlock(false);
+		} catch (e) {
+			console.log(e.message);
+		}
+	};
+
+	return [isUnlock, unlockAccount, lockAccount];
 };

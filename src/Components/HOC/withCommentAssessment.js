@@ -1,7 +1,6 @@
-import { useContext } from "react";
 import { useCommentAssessment } from "../../Hooks/useCommentAssessment";
 import { Button } from "../Shared/Button/Button";
-import { Context } from "../Content/Content";
+import { useUserContext } from "../../Hooks/useUserContext";
 
 export const withCommentAssessment = (Component) => {
 	return (props) => {
@@ -10,8 +9,8 @@ export const withCommentAssessment = (Component) => {
 			props.CASId,
 			props.id
 		);
-		const { address } = useContext(Context);
-		debugger;
+		const { address } = useUserContext();
+
 		return (
 			<Component {...props}>
 				<Button onClick={like} disabled={props.users.includes(address)}>

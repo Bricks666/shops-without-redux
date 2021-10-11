@@ -1,5 +1,3 @@
-import { Button } from "../Button/Button";
-import { BottomWindow } from "../BottomWindow/BottomWindow";
 import { useShopsList } from "../../../Hooks/useShopsList";
 import { List } from "../List/List";
 
@@ -8,10 +6,8 @@ export const ShopsList = (props) => {
 	console.log(shops);
 	return (
 		<div>
+			<h3>Магазины</h3>
 			<List Card={props.ShopCard} items={shops} />
-			<Button>Показать продавцов</Button>
-			{props.children}
-			<BottomWindow></BottomWindow>
 		</div>
 	);
 };

@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from "react";
 import { api } from "../API/api";
 import { toValidProfile } from "../Services/toValidProfile";
-import { useRoleSubscribe } from "./Subscribes/useRoleSubscribe";
+import { useChangeRoleSubscribe } from "./Subscribes/useChangeRoleSubscribe";
 import { useNewRoleSubscribe } from "./Subscribes/useNewRoleSubscribe";
 
 const reducer = (state, action) => {
@@ -69,7 +69,6 @@ const newRole = (role) => {
 
 export const useProfile = (throwUser) => {
 	const [state, dispatch] = useReducer(reducer, {});
-
 	useEffect(() => {
 		let intervalId;
 
@@ -95,7 +94,7 @@ export const useProfile = (throwUser) => {
 		};
 	}, []);
 
-	useRoleSubscribe(
+	useChangeRoleSubscribe(
 		({ role }) => {
 			dispatch(changeRole(role));
 			throwUser({ ...state, role: +role });

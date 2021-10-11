@@ -1,17 +1,16 @@
 import { useWalletsAddresses } from "../../../Hooks/useWalletsAddresses";
+import { Select } from "../../Shared/Select/Select";
 
 export const ChooseWallet = (props) => {
-	const [walletsAddresses] = useWalletsAddresses(props.web3);
-	console.log(walletsAddresses);
+	const [walletsAddresses] = useWalletsAddresses();
+
 	return (
-		<select required select="0">
-			{walletsAddresses.map((wallet) => {
-				return (
-					<option key={wallet} value={wallet}>
-						{wallet}
-					</option>
-				);
-			})}
-		</select>
+		<Select
+			value={props.value}
+			input={props.input}
+			names={walletsAddresses}
+			values={walletsAddresses}
+			required={true}
+		/>
 	);
 };

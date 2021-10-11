@@ -6,17 +6,23 @@ import { Content } from "../Content/Content";
 import { ContentRedirect } from "../ContentRedirect/ContentRedicrect";
 import { Login } from "../Login/Login";
 import { Registration } from "../Registration/Registration";
+import { Button } from "../Shared/Button/Button";
 import { WalletEnter } from "../WalletEnter/WalletEnter";
 import "./App.css";
 
 const App = (props) => {
 	const [isAppInitial] = useStartInitial();
 
-	const [isUnlock, unlock] = useAccount();
+	const [isUnlock, unlock, lock] = useAccount();
 
 	const [isLogin, setLogin] = useState(false);
 
 	const [isRegistration, setRegistration] = useState(false);
+
+	const lockAccount = () => {
+		setLogin(false);
+		lock();
+	};
 
 	if (isAppInitial === false) {
 		return (
@@ -35,7 +41,7 @@ const App = (props) => {
 					isRegistration={isRegistration}
 				/>
 				<Switch>
-					<Route exact path="/unlock">
+					<Route path="/unlock">
 						<WalletEnter unlock={unlock} />
 					</Route>
 					<Route path="/login">
@@ -48,6 +54,13 @@ const App = (props) => {
 						<Content />
 					</Route>
 				</Switch>
+				{isUnlock ? (
+					<Button className="lock-account-button" onClick={lockAccount}>
+						Сменить кошелек
+					</Button>
+				) : (
+					""
+				)}
 			</section>
 		</BrowserRouter>
 	);

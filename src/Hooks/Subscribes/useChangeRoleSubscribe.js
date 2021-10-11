@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { api } from "../../API/api";
 
-export const useRoleSubscribe = (callback, filters = {}, condition) => {
+export const useChangeRoleSubscribe = (callback, filters = {}, condition) => {
 	useEffect(() => {
 		console.log("subscribe");
 		const subscribe = api.subscribeChangeRole(callback, filters);

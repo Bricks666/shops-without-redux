@@ -3,23 +3,29 @@ import { Route, Switch } from "react-router";
 import { MainContentRedirect } from "./MainContentRedirect";
 import { Profile } from "../Profile/Profile";
 import { BuyerMainContent } from "./MainContent/Buyer/BuyerMainContent";
-
-export const Context = React.createContext();
+import { UserContext } from "../../Hooks/useUserContext";
+import { AdminMainContent } from "./MainContent/Admin/AdminMainContent";
+import { SalesmanMainContent } from "./MainContent/Salesman/SalesmanMainContent";
 
 export const Content = (props) => {
 	const [user, setUser] = useState({ role: -1 });
-	console.log(user);
 	return (
 		<section>
-			<Context.Provider value={user}>
+			<UserContext.Provider value={user}>
 				<Profile throwUser={setUser} />
 				<MainContentRedirect role={user.role} />
 				<Switch>
-					<Route path="/shops">
+					<Route path="/buyer">
 						<BuyerMainContent />
 					</Route>
+					<Route path="/admin">
+						<AdminMainContent />
+					</Route>
+					<Route path="/salesman">
+						<SalesmanMainContent />
+					</Route>
 				</Switch>
-			</Context.Provider>
+			</UserContext.Provider>
 		</section>
 	);
 };

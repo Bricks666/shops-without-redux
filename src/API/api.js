@@ -25,6 +25,9 @@ export const api = {
 
 		return true;
 	},
+	async lockAccount() {
+		return await web3.eth.personal.lockAccount(sender);
+	},
 	async getWalletsAddresses() {
 		return await web3.eth.getAccounts();
 	},
@@ -42,6 +45,9 @@ export const api = {
 	async getProfileInfo() {
 		return await contract.methods.user(sender).call();
 	},
+	async getUserInfo(userAddress) {
+		return await contract.methods.user(userAddress).call();
+	},
 	async getBalance() {
 		return (await web3.eth.getBalance(sender)) / 10 ** 18;
 	},
@@ -53,6 +59,23 @@ export const api = {
 	},
 	async getShop(shopId) {
 		return await contract.methods.shop(shopId).call();
+	},
+	async removeShop(shopId) {
+		return await contract.methods
+			.DeleteShop(shopId)
+			.send({ from: sender })
+			.on("receipt", (response) => console.log(response));
+	},
+	async addShop(freeAddressId, city, nameStore, login, password) {
+		return await contract.methods
+			.AddShop(
+				freeAddressId,
+				city,
+				nameStore,
+				hashing(login),
+				hashing(password)
+			)
+			.send({ from: sender });
 	},
 	async getCAS(shopAddress) {
 		return await contract.methods
@@ -102,41 +125,101 @@ export const api = {
 			.addComment(shopAddress, CASId, comment)
 			.send({ from: sender });
 	},
-	beBuyer() {
-		contract.methods.BeShoper().send({ from: sender });
+	async beBuyer() {
+		return await contract.methods.BeShoper().send({ from: sender });
 	},
-	beSalesman() {
-		contract.methods.BeSalesman().send({ from: sender });
+	async beSalesman() {
+		return await contract.methods.BeSalesman().send({ from: sender });
 	},
-	beAdmin() {
-		contract.methods.BeAdmin().send({ from: sender });
+	async beAdmin() {
+		return await contract.methods.BeAdmin().send({ from: sender });
 	},
-	beBuyerForever() {
-		contract.methods.RequestToShoper().send({ from: sender });
+	async beAdminForever() {
+		return await contract.methods.RequestToAdmin().send({ from: sender });
 	},
-	beSalesmanForever(shopId) {
-		contract.methods.RequestToSalesman(shopId).send({ from: sender });
+	async beBuyerForever() {
+		return await contract.methods.RequestToShoper().send({ from: sender });
 	},
-	subscribeChangeRole(callback, filters) {
-		return contract.events.ChangeRole(
-			{ filters },
-			(error, { returnValues }) => {
-				if (error === null) {
-					callback(returnValues);
-				}
-			}
-		);
+	async beSalesmanForever(shopId) {
+		return await contract.methods
+			.RequestToSalesman(+shopId)
+			.send({ from: sender })
+			.on("receipt", (response) => console.log(response));
 	},
-	subscribeNewRole(callback, filters) {
-		return contract.events.NewRole({ filters }, (error, { returnValues }) => {
+	async getUsersAddresses() {
+		return await contract.methods.GetUserAddress().call();
+	},
+	async getFreeAddresses() {
+		return await contract.methods.GetFreeAddress().call();
+	},
+	async getFreeAddress(freeAddressId) {
+		return await contract.methods.freeAddress(freeAddressId).call();
+	},
+	async getBeBuyerRequests() {
+		return await contract.methods.GetBeShoperRequest().call();
+	},
+	async acceptBeBuyerRequest(requestId) {
+		return await contract.methods
+			.AccRequestToShoper(requestId)
+			.send({ from: sender });
+	},
+	async cancelBeBuyerRequest(requestId) {
+		return await contract.methods
+			.CancelRequestToShoper(requestId)
+			.send({ from: sender });
+	},
+	async getBeSalesmanRequests() {
+		return await contract.methods.GetBeSalesmanRequest().call();
+	},
+	async acceptBeSalesmanRequest(requestId) {
+		return await contract.methods
+			.AccRequestToSalesman(requestId)
+			.send({ from: sender });
+	},
+	async cancelBeSalesmanRequest(requestId) {
+		return await contract.methods
+			.CancelRequestToSalesman(requestId)
+			.send({ from: sender });
+	},
+	async getBeAdminRequests() {
+		return await contract.methods.GetBeAdminRequest().call();
+	},
+	async acceptBeAdminRequest(requestId) {
+		return await contract.methods
+			.AccRequestToAdmin(requestId)
+			.send({ from: sender });
+	},
+	async cancelBeAdminRequest(requestId) {
+		return await contract.methods
+			.CancelRequestToAdmin(requestId)
+			.send({ from: sender });
+	},
+	async getBeBuyerRequest(requestId) {
+		return await contract.methods.requestToShoper(requestId).call();
+	},
+	async getBeSalesmanRequest(requestId) {
+		return await contract.methods.requestToSalesman(requestId).call();
+	},
+	async getBeAdminRequest(requestId) {
+		return await contract.methods.requestToAdmin(requestId).call();
+	},
+	subscribeChangeRole(callback, filter) {
+		return contract.events.ChangeRole({ filter }, (error, { returnValues }) => {
 			if (error === null) {
 				callback(returnValues);
 			}
 		});
 	},
-	subscribeAddShop(callback, filters) {
+	subscribeNewRole(callback, filter) {
+		return contract.events.NewRole({ filter }, (error, { returnValues }) => {
+			if (error === null) {
+				callback(returnValues);
+			}
+		});
+	},
+	subscribeAddShop(callback, filter) {
 		return contract.events.AddShopEvent(
-			{ filters },
+			{ filter },
 			(error, { returnValues }) => {
 				if (error === null) {
 					callback(returnValues);
@@ -144,19 +227,32 @@ export const api = {
 			}
 		);
 	},
-	subscribeRemoveShop(callback, filters) {
-		return contract.events.RemoveShop(
-			{ filters },
+	subscribeRemoveShop(callback, filter) {
+		return contract.events.RemoveShop({ filter }, (error, { returnValues }) => {
+			if (error === null) {
+				callback(returnValues);
+			}
+		});
+	},
+	subscribeRemoveSalesman(callback, filter) {
+		return contract.events.RemoveSalesmans(
+			{ filter },
 			(error, { returnValues }) => {
-				if (error === null) {
-					callback(returnValues);
-				}
+				callback(returnValues);
 			}
 		);
 	},
-	subscribeNewCAS(callback, filters) {
+	subscribeNewSalesman(callback, filter) {
+		return contract.events.AddSalesman(
+			{ filter },
+			(error, { returnValues }) => {
+				callback(returnValues);
+			}
+		);
+	},
+	subscribeNewCAS(callback, filter) {
 		return contract.events.NewComplaint(
-			{ filters },
+			{ filter },
 			(error, { returnValues }) => {
 				if (error === null) {
 					callback(returnValues);
@@ -164,9 +260,9 @@ export const api = {
 			}
 		);
 	},
-	subscribeChangeCASMark(callback, filters) {
+	subscribeChangeCASMark(callback, filter) {
 		return contract.events.MarkComplaint(
-			{ filters },
+			{ filter },
 			(error, { returnValues }) => {
 				if (error === null) {
 					callback(returnValues);
@@ -174,25 +270,72 @@ export const api = {
 			}
 		);
 	},
-	subscribeNewComment(callback, filters) {
-		return contract.events.NewComment(
-			{ filters },
-			(error, { returnValues }) => {
-				if (error === null) {
-					callback(returnValues);
-				}
+	subscribeNewComment(callback, filter) {
+		return contract.events.NewComment({ filter }, (error, { returnValues }) => {
+			if (error === null) {
+				callback(returnValues);
 			}
-		);
+		});
 	},
-	subscribeChangeCommentMark(callback, filters) {
+	subscribeChangeCommentMark(callback, filter) {
 		return contract.events.MarkComment(
-			{ filters },
+			{ filter },
+			(error, { returnValues }) => {
+				console.log(returnValues);
+				if (error === null) {
+					callback(returnValues);
+				}
+			}
+		);
+	},
+	subscribeNewUser(callback, filter) {
+		return contract.events.NewUser({ filter }, (error, { returnValues }) => {
+			if (error === null) {
+				callback(returnValues);
+			}
+		});
+	},
+	subscribeNewFreeAddress(callback, filter) {
+		return contract.events.AddFreeAddress(
+			{ filter },
 			(error, { returnValues }) => {
 				if (error === null) {
 					callback(returnValues);
 				}
 			}
 		);
+	},
+	subscribeRemoveFreeAddress(callback, filter) {
+		return contract.events.RemoveFreeAddress(
+			{ filter },
+			(error, { returnValues }) => {
+				if (error === null) {
+					callback(returnValues);
+				}
+			}
+		);
+	},
+	subscribeFinishRequest(callback, filter) {
+		return contract.events.RequestFinished(
+			{ filter },
+			(error, { returnValues }) => {
+        console.log(error, returnValues)
+				if (error === null) {
+					console.log(returnValues);
+					callback(returnValues);
+				}
+			}
+		);
+	},
+	subscribeNewRequest(callback, filter) {
+		return contract.events.NewRequest({ filter }, (error, { returnValues }) => {
+      console.log(error, returnValues)
+
+			if (error === null) {
+				console.log(returnValues);
+				callback(returnValues);
+			}
+		});
 	},
 };
 

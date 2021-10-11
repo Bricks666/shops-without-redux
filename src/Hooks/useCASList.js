@@ -15,6 +15,7 @@ const reducer = (state, action) => {
 		case "CHANGE_MARK": {
 			return state.map((CAS) => {
 				if (CAS.id === action.CASId) {
+
 					return {
 						...CAS,
 						users: [...CAS.users, action.sender],

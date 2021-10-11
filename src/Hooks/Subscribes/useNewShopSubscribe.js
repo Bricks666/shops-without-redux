@@ -4,7 +4,8 @@ import { toValidShop } from "../../Services/toValidShop";
 
 export const useNewShopSubscribe = (callback, filters = {}, condition) => {
 	useEffect(() => {
-		const getShop = async (shopAddress) => {
+		const getShop = async ({ Address: shopAddress }) => {
+
 			const shopId = await api.getShopIdByAddress(shopAddress);
 			const shop = await api.getShop(shopId);
 

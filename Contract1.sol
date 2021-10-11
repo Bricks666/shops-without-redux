@@ -60,8 +60,8 @@ contract Shoping {
     event RequestFinished(string indexed Name, uint requestId);
     event NewRequest(string indexed Name, uint requestId);
     //freeAddress
-    event AddFreeAddress(address Address);
-    event RemoveFreeAddress(address Address);
+    event AddFreeAddress(uint Address);
+    event RemoveFreeAddress(uint Address);
 
     constructor() public {
         user[0x98ABCBdDb13B61b30205c04B325A2202050d2bBC] = User(0x98ABCBdDb13B61b30205c04B325A2202050d2bBC, "Иванов Иван Иванович", keccak256(abi.encodePacked("ivan")), keccak256(abi.encodePacked("ivan")), 3, -1, false, true);

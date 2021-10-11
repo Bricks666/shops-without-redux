@@ -1,7 +1,7 @@
 pragma solidity 0.5.16;
 pragma experimental ABIEncoderV2;
 
-import {Shoping} from './Contract1.sol';
+import {Shoping} from './Shoping1.sol';
 
 
 contract Shoping2 is Shoping{
@@ -74,10 +74,10 @@ contract Shoping2 is Shoping{
         requestToAdmin.push(Request(requestToAdmin.length, msg.sender, user[msg.sender].role, 3, -1, false));
         emit NewRequest("BeAdmin",requestToAdmin.length-1);
     }
-    function RequestToSalesman(int shopId) IsUser CheckRequestToSalesman public {
+    function RequestToSalesman(uint shopId) IsUser CheckRequestToSalesman public {
         require(user[msg.sender].role == 1, "Вы не покупатель. проврьте свойю роль");
         require(user[msg.sender].isSalesman==false, "Вы уже продавец");
-        requestToSalesman.push(Request(requestToSalesman.length, msg.sender, user[msg.sender].role, 2, shopId, false));
+        requestToSalesman.push(Request(requestToSalesman.length, msg.sender, user[msg.sender].role, 2, int(shopId), false));
         emit NewRequest("BeSalesman",requestToSalesman.length-1);
     }
     function RequestToShoper() IsUser CheckRequestToShoper public {
@@ -144,9 +144,9 @@ contract Shoping2 is Shoping{
         user[freeAddress[freeAddressId]]=User(freeAddress[freeAddressId], nameStore, login, password, 6, -1, false, false);
         shops.push(Shop(shops.length, freeAddress[freeAddressId], city, zeroAddress, false));
         AddressToShop[freeAddress[freeAddressId]]=shops.length-1;
-        delete freeAddress[freeAddressId];
         emit AddShopEvent(freeAddress[freeAddressId]);
-        emit RemoveFreeAddress(freeAddress[freeAddressId]);
+        delete freeAddress[freeAddressId];
+        emit RemoveFreeAddress(freeAddressId);
     }
     function DeleteShop(uint shopId) public IsAdmin {
         require(shops[shopId].Address != address(0), "Несуществующий магазин");
@@ -154,7 +154,7 @@ contract Shoping2 is Shoping{
         freeAddress.push(shops[shopId].Address);
         delete user[shops[shopId].Address];
         emit RemoveShop(shops[shopId].Address);
-        emit AddFreeAddress(shops[shopId].Address);
+        emit AddFreeAddress(freeAddress.length-1);
         delete shops[shopId];
     }
 /*    function ToBankRequest() public IsStore(msg.sender){

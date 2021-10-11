@@ -3,6 +3,8 @@ import { api } from "../API/api";
 import { toValidShop } from "../Services/toValidShop";
 import { useNewShopSubscribe } from "./Subscribes/useNewShopSubscribe";
 import { useRemoveShopSubscribe } from "./Subscribes/useRemoveShopSubscribe";
+import { useNewSalesmanSubscribe } from "./Subscribes/useNewSalesmanSubscribe";
+import { useRemoveSalesmanSubscribe } from "./Subscribes/useRemoveSalesmanSubscribe";
 
 const reducer = (state, action) => {
 	switch (action.type) {
@@ -14,6 +16,31 @@ const reducer = (state, action) => {
 		}
 		case "REMOVE_SHOP": {
 			return state.filter((shop) => shop.address !== action.shopAddress);
+		}
+		case "NEW_SALESMAN": {
+			return state.map((shop) => {
+				if (shop.id === action.shopId) {
+					return {
+						...shop,
+						salesmen: [...shop.salesmen, action.salesmanAddress],
+					};
+				}
+
+				return shop;
+			});
+		}
+		case "REMOVE_SALESMAN": {
+			return state.map((shop) => {
+				if (shop.id === action.shopId) {
+					return {
+						...shop,
+						salesmen: shop.salesmen.filter(
+							(address) => address !== action.salesmanAddress
+						),
+					};
+				}
+				return shop;
+			});
 		}
 		default: {
 			return state;
@@ -39,6 +66,20 @@ const removeShop = (shopAddress) => {
 		shopAddress,
 	};
 };
+const newSalesman = (salesmanAddress, shopId) => {
+	return {
+		type: "NEW_SALESMAN",
+		salesmanAddress,
+		shopId,
+	};
+};
+const removeSalesman = (salesmanAddress, shopId) => {
+	return {
+		type: "REMOVE_SALESMAN",
+		salesmanAddress,
+		shopId,
+	};
+};
 
 export const useShopsList = () => {
 	const [state, dispatch] = useReducer(reducer, []);
@@ -56,6 +97,13 @@ export const useShopsList = () => {
 	useNewShopSubscribe((shop) => dispatch(addShop(shop)));
 
 	useRemoveShopSubscribe((shopAddress) => dispatch(removeShop(shopAddress)));
+
+	useNewSalesmanSubscribe(({ Address: salesmanAddress, shopId }) =>
+		dispatch(newSalesman(salesmanAddress, shopId))
+	);
+	useRemoveSalesmanSubscribe(({ Address: salesmanAddress, shopId }) =>
+		dispatch(removeSalesman(salesmanAddress, shopId))
+	);
 
 	return [state];
 };
