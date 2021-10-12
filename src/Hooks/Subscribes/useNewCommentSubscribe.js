@@ -9,11 +9,15 @@ export const useNewCommentSubscribe = (callback, filters = {}) => {
 			complaintsId: CASId,
 			commentId,
 		}) => {
-			const comment = toValidComment(
-				await api.getCommentById(shopAddress, CASId, commentId)
-			);
+			try {
+				const comment = toValidComment(
+					await api.getCommentById(shopAddress, CASId, commentId)
+				);
 
-			callback(comment);
+				callback(comment);
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		const subscribe = api.subscribeNewComment(getComment, filters);

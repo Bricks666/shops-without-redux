@@ -10,7 +10,13 @@ const parseProfileInfo = (profileInfo) => {
 				<>
 					<dt key={pair[0]}>{pair[0]}</dt>{" "}
 					<dd key={pair[1]}>
-						{pair[0] === "role" ? getStringRole(pair[1]) : pair[1]}
+						{pair[0] === "role"
+							? getStringRole(pair[1])
+							: pair[0] === "haveBankMoney"
+							? pair[1]
+								? "Мы взяли в займы"
+								: "Мы не брали в займы"
+							: pair[1]}
 					</dd>
 				</>
 			);
@@ -19,7 +25,6 @@ const parseProfileInfo = (profileInfo) => {
 
 export const Profile = (props) => {
 	const [profileInfo] = useProfile(props.throwUser);
-	console.log(profileInfo);
 	return (
 		<div>
 			<dl>{parseProfileInfo(profileInfo)}</dl>

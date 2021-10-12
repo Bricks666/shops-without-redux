@@ -27,13 +27,17 @@ export class Login extends Component {
 	}
 
 	async login(evt) {
-		evt.preventDefault();
+		try {
+			evt.preventDefault();
 
-		const response = await api.login(this.state.login, this.state.password);
+			const response = await api.login(this.state.login, this.state.password);
 
-		this.setState({ login: "", password: "" });
+			this.setState({ login: "", password: "" });
 
-		this.props.setLogin(response);
+			this.props.setLogin(response);
+		} catch (e) {
+			console.log(e.message);
+		}
 	}
 
 	render() {

@@ -9,16 +9,19 @@ import {
 import { toValidRequest } from "../Services/toValidRequest";
 import { useNewRequestSubscribe } from "./Subscribes/useNewRequestSubscribe";
 import { useFinishRequestSubscribe } from "./Subscribes/useFinishRequestSubscribe";
-import { toHex } from "../Services/toHex";
 
 export const useBeAdminRequestsList = () => {
 	const [state, dispatch] = useReducer(reducer, []);
 
 	useEffect(() => {
 		const getRequests = async () => {
-			const requests = await api.getBeAdminRequests();
+			try {
+				const requests = await api.getBeAdminRequests();
 
-			dispatch(setRequest(requests.map(toValidRequest)));
+				dispatch(setRequest(requests.map(toValidRequest)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getRequests();
@@ -26,20 +29,22 @@ export const useBeAdminRequestsList = () => {
 
 	useNewRequestSubscribe(
 		async ({ requestId }) => {
-			debugger;
-			const request = await api.getBeAdminRequest(requestId);
+			try {
+				const request = await api.getBeAdminRequest(requestId);
 
-			dispatch(addRequest(toValidRequest(request)));
+				dispatch(addRequest(toValidRequest(request)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		},
-		{ Name: toHex("BeAdmin") }
+		{ typeCode: 3 }
 	);
 
 	useFinishRequestSubscribe(
 		({ requestId }) => {
-			debugger;
-			dispatch(finishRequest(requestId));
+			dispatch(finishRequest(+requestId));
 		},
-		{ Name: toHex("BeAdmin") }
+		{ typeCode: 3 }
 	);
 
 	return [state];

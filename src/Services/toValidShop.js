@@ -3,7 +3,7 @@ export const toValidShop = (shop) => {
 		id: shop.Id,
 		address: shop.Address,
 		city: shop.city,
-		salesmen: shop.salesmans,
+		salesmen: shop.salesmans ?? [],
 		haveBankMoney: shop.haveBankMoney,
 	};
 };

@@ -31,19 +31,23 @@ export class Registration extends Component {
 	}
 
 	async registration(evt) {
-		evt.preventDefault();
+		try {
+			evt.preventDefault();
 
-		const response = await api.registration(
-			this.state.name,
-			this.state.login,
-			this.state.password
-		);
+			const response = await api.registration(
+				this.state.name,
+				this.state.login,
+				this.state.password
+			);
 
-		this.setState({ name: "", login: "", password: "" });
+			this.setState({ name: "", login: "", password: "" });
 
-		console.log(response);
+			console.log(response);
 
-		this.props.setRegistration(true);
+			this.props.setRegistration(true);
+		} catch (e) {
+			console.log(e.message);
+		}
 	}
 
 	render() {

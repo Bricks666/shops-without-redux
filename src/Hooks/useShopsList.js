@@ -86,9 +86,13 @@ export const useShopsList = () => {
 
 	useEffect(() => {
 		const getShops = async () => {
-			const shops = (await api.getShops()).map(toValidShop);
+			try {
+				const shops = (await api.getShops()).map(toValidShop);
 
-			dispatch(setShops(shops));
+				dispatch(setShops(shops));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getShops();

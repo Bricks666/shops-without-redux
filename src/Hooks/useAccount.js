@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { api } from "../API/api";
 
+const subscribers = [];
+
 export const useAccount = () => {
 	const [isUnlock, setUnlock] = useState(false);
 
@@ -17,6 +19,7 @@ export const useAccount = () => {
 	const lockAccount = async () => {
 		try {
 			await api.lockAccount();
+			subscribers.forEach((element) => element());
 			setUnlock(false);
 		} catch (e) {
 			console.log(e.message);
@@ -24,4 +27,8 @@ export const useAccount = () => {
 	};
 
 	return [isUnlock, unlockAccount, lockAccount];
+};
+
+export const subscribeLock = (subscriber) => {
+	subscribers.push(subscriber);
 };

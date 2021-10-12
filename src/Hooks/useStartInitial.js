@@ -7,12 +7,16 @@ export const useStartInitial = () => {
 
 	useEffect(() => {
 		const initial = async () => {
-			const isInitialWeb3 = api.initialWeb3();
-			setInitial(isInitialWeb3);
+			try {
+				const isInitialWeb3 = api.initialWeb3();
+				setInitial(isInitialWeb3);
 
-			const isConnectContract = await api.connectContract();
+				const isConnectContract = await api.connectContract();
 
-			setConnect(isConnectContract);
+				setConnect(isConnectContract);
+			} catch {
+				setTimeout(initial, 1500);
+			}
 		};
 
 		initial();

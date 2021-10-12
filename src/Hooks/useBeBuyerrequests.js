@@ -15,9 +15,14 @@ export const useBeBuyerRequests = () => {
 
 	useEffect(() => {
 		const getRequests = async () => {
-			const requests = await api.getBeBuyerRequests();
+			try {
+				const requests = await api.getBeBuyerRequests();
+				console.log(requests);
 
-			dispatch(setRequest(requests.map(toValidRequest)));
+				dispatch(setRequest(requests.map(toValidRequest)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getRequests();
@@ -25,15 +30,19 @@ export const useBeBuyerRequests = () => {
 
 	useNewRequestSubscribe(
 		async ({ requestId }) => {
-			const request = await api.getBeBuyerRequest(requestId);
-
-			dispatch(addRequest(toValidRequest(request)));
+			try {
+				const request = await api.getBeBuyerRequest(requestId);
+				console.log(requestId);
+				dispatch(addRequest(toValidRequest(request)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		},
-		{ Name: "BeShoper" }
+		{ typeCode: 1 }
 	);
 	useFinishRequestSubscribe(
-		({ requestId }) => dispatch(finishRequest(requestId)),
-		{ Name: "BeShoper" }
+		({ requestId }) => dispatch(finishRequest(+requestId)),
+		{ typeCode: 1 }
 	);
 
 	return [state];

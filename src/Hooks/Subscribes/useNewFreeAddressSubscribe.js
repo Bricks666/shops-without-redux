@@ -5,12 +5,16 @@ import { toValidFreeAddress } from "../../Services/toValidFreeAddress";
 export const useNewFreeAddressSubscribe = (callback, filters = {}) => {
 	useEffect(() => {
 		const getAddress = async ({ Address: addressId }) => {
-			const validAddress = toValidFreeAddress(
-				await api.getFreeAddress(addressId),
-				addressId
-			);
+			try {
+				const validAddress = toValidFreeAddress(
+					await api.getFreeAddress(addressId),
+					addressId
+				);
 
-			callback(validAddress);
+				callback(validAddress);
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		const subscribe = api.subscribeNewFreeAddress(getAddress, filters);

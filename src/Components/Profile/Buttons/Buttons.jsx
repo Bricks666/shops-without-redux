@@ -8,7 +8,7 @@ export const Buttons = (props) => {
 	return props.isSalesman || props.isAdmin ? (
 		<div>
 			<BeBuyer role={props.role} />
-			{props.IsSalesman ? (
+			{props.isSalesman ? (
 				<>
 					<BeSalesman role={props.role} />
 					<BeBuyerForever />{" "}
@@ -18,7 +18,9 @@ export const Buttons = (props) => {
 			)}
 			{props.isAdmin ? <BeAdmin role={props.role} /> : ""}
 		</div>
-	) : (
+	) : [4, 5, 6].includes(props.role) === false ? (
 		<BeAdminForever />
+	) : (
+		""
 	);
 };

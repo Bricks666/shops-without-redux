@@ -13,5 +13,11 @@ export const toValidProfile = (profile) => {
 		validProfile.shopId = profile.shopId;
 	}
 
+	if (validProfile.role === 6) {
+		validProfile.city = profile.city;
+		validProfile.id = profile.Id;
+		validProfile.haveBankMoney = profile.haveBankMoney;
+	}
+
 	return validProfile;
 };

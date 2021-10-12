@@ -31,6 +31,7 @@ const reducer = (state, action) => {
 						isSalesman: +action.role === 2,
 					};
 				}
+				return user;
 			});
 		}
 		case "NEW_USER": {
@@ -73,17 +74,22 @@ export const useUsersList = () => {
 
 	useEffect(() => {
 		const getUsers = async () => {
-			const usersAddresses = await api.getUsersAddresses();
+			try {
+				const usersAddresses = await api.getUsersAddresses();
 
-			const users = await Promise.all(
-				usersAddresses.map((address) => api.getUserInfo(address))
-			);
-			const validUsers = users
-				.filter(
-					(user) => user.role !== "4" && user.role !== "5" && user.role !== "6"
-				)
-				.map(toValidUser);
-			dispatch(setUsers(validUsers));
+				const users = await Promise.all(
+					usersAddresses.map((address) => api.getUserInfo(address))
+				);
+				const validUsers = users
+					.filter(
+						(user) =>
+							user.role !== "4" && user.role !== "5" && user.role !== "6"
+					)
+					.map(toValidUser);
+				dispatch(setUsers(validUsers));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getUsers();

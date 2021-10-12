@@ -25,28 +25,27 @@ export const useSalesmenList = (salesmenAddresses) => {
 
 	useEffect(() => {
 		const getSalesmen = async () => {
-			const salesmen = [];
-			salesmenAddresses.forEach((address) => {
-				const index = state.findIndex((salesman) => {
-					return salesman.address === address;
+			try {
+				const salesmen = [];
+				salesmenAddresses.forEach((address) => {
+					const index = state.findIndex((salesman) => {
+						return salesman.address === address;
+					});
+
+					if (index === -1) {
+						salesmen.push(api.getUserInfo(address));
+					} else {
+						salesmen.push(state[index]);
+					}
 				});
-
-				if (index === -1) {
-					salesmen.push(api.getUserInfo(address));
-				} else {
-					salesmen.push(state[index]);
-				}
-			});
-			const promiseSalesmen = await Promise.all(salesmen);
-			console.log(promiseSalesmen);
-			dispatch(setSalesmen(promiseSalesmen.map(toValidSalesman)));
+				const promiseSalesmen = await Promise.all(salesmen);
+				console.log(promiseSalesmen);
+				dispatch(setSalesmen(promiseSalesmen.map(toValidSalesman)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
-
 		getSalesmen();
-		try {
-		} catch (e) {
-			console.log(e.message);
-		}
 	}, [salesmenAddresses]);
 
 	return [state];

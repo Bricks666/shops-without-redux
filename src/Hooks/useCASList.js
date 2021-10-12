@@ -15,7 +15,6 @@ const reducer = (state, action) => {
 		case "CHANGE_MARK": {
 			return state.map((CAS) => {
 				if (CAS.id === action.CASId) {
-
 					return {
 						...CAS,
 						users: [...CAS.users, action.sender],
@@ -60,9 +59,13 @@ export const useCASList = (shopAddress) => {
 
 	useEffect(() => {
 		const getCAS = async () => {
-			const CAS = await api.getCAS(shopAddress);
+			try {
+				const CAS = await api.getCAS(shopAddress);
 
-			dispatch(setCAS(CAS.map(toValidCAS)));
+				dispatch(setCAS(CAS.map(toValidCAS)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getCAS();

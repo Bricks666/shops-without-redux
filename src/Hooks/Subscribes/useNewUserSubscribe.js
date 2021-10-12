@@ -5,9 +5,13 @@ import { toValidUser } from "../../Services/toValidUser";
 export const useNewUserSubscribe = (callback, filters = {}) => {
 	useEffect(() => {
 		const getUser = async ({ user: userAddress }) => {
-			const user = await api.getUserInfo(userAddress);
+			try {
+				const user = await api.getUserInfo(userAddress);
 
-			callback(toValidUser(user));
+				callback(toValidUser(user));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		const subscribe = api.subscribeNewUser(getUser, filters);

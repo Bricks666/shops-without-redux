@@ -4,7 +4,7 @@ contract Shoping {
     struct User {
         address Address;
         string FIO;
-        bytes32 login;
+        string login;
         bytes32 password;
         uint role; // 1-покупатель  2-продавец  3-админ  4-поставщик  5-банк  6-магазин
         int shopId;
@@ -20,14 +20,14 @@ contract Shoping {
     }
     struct Comment {
         uint Id;
-        bytes32 login;
+        string login;
         string comment;
         address[] likes;
         address[] dislikes;
     }
     struct ComplaintsAndSuggestions {
         uint Id;
-        bytes32 login;
+        string login;
         string comment;
         uint mark;
         address[] likes;
@@ -57,19 +57,23 @@ contract Shoping {
     event NewComment(address indexed Address, uint indexed complaintsId, uint commentId);
     event MarkComment(address indexed Address, uint indexed complaintsId, uint commentId, uint mark, address senderAddress);
     //Request
-    event RequestFinished(string indexed Name, uint requestId);
-    event NewRequest(string indexed Name, uint requestId);
+    event RequestFinished(uint indexed typeCode, uint requestId);// 1 -beBuyer, 2 - beSalesman, 3 - beAdmin
+    event NewRequest(uint indexed typeCode, uint requestId);
     //freeAddress
     event AddFreeAddress(uint Address);
     event RemoveFreeAddress(uint Address);
 
     constructor() public {
-        user[0x98ABCBdDb13B61b30205c04B325A2202050d2bBC] = User(0x98ABCBdDb13B61b30205c04B325A2202050d2bBC, "Иванов Иван Иванович", keccak256(abi.encodePacked("ivan")), keccak256(abi.encodePacked("ivan")), 3, -1, false, true);
+        user[0x98ABCBdDb13B61b30205c04B325A2202050d2bBC] = User(0x98ABCBdDb13B61b30205c04B325A2202050d2bBC, "Иванов Иван Иванович", "ivan", keccak256(abi.encodePacked("ivan")), 3, -1, false, true);
         userArray.push(0x98ABCBdDb13B61b30205c04B325A2202050d2bBC);
-        user[0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268] = User(0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268, "Магазин", keccak256(abi.encodePacked("shop")), keccak256(abi.encodePacked("shop")), 6, -1, false, false);
+        user[0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268] = User(0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268, "Магазин", "shop", keccak256(abi.encodePacked("shop")), 6, -1, false, false);
         userArray.push(0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268);
         AddressToShop[0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268]=shops.length;
-        shops.push(Shop(shops.length, 0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268, "kaluga", zeroAddress, false));
+        address[] memory startSalesmen = new address[](1);
+        startSalesmen[0] = 0x05E20dC1d88dfF98C1c3e9a04d6d571e1e895B71;
+        shops.push(Shop(shops.length, 0x5E0d17253fe14d19FAe6de54C6BFa49B334Bf268, "kaluga", startSalesmen, false));
+        user[0x05E20dC1d88dfF98C1c3e9a04d6d571e1e895B71] = User(0x05E20dC1d88dfF98C1c3e9a04d6d571e1e895B71, "Продавец Продавцов", "salesman", keccak256(abi.encodePacked("salesman")), 2, 0, true, false);
+        userArray.push(0x05E20dC1d88dfF98C1c3e9a04d6d571e1e895B71);
         freeAddress.push(0x0A098Eda01Ce92ff4A4CCb7A4fFFb5A43EBC70DC);
 
     }
@@ -81,13 +85,13 @@ contract Shoping {
     Request[] public requestToSalesman;
     Request[] public requestToAdmin;
 
-/*    mapping (uint => bool) public BankRequestShop;*/
+    mapping (uint => bool) public BankRequestShop;
     mapping (address => uint) public AddressToShop;
     mapping (address => mapping (uint => Comment[])) public comments;
     address payable[] public freeAddress;
     address[] public zeroAddress;
     address[] public userArray;
-/*    uint[] public BankRequestIndexes;*/
+    uint[] public BankRequestIndexes;
 
     address payable bankAddress = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
     address payable provider = 0x17F6AD8Ef982297579C203069C1DbfFE4348c372;
@@ -117,34 +121,14 @@ contract Shoping {
     modifier IsUser() {
         require(user[msg.sender].Address != address(0), "Вы не зарегистрированы");
     _;}
-    modifier CheckLogin(bytes32 login) {
+    modifier CheckLogin(string memory login) {
         for (uint256 i=0; i<userArray.length; i++) {
-            require(login != user[userArray[i]].login, "Логие занят");
+            require(keccak256(abi.encodePacked(login)) != keccak256(abi.encodePacked(user[userArray[i]].login)), "Логие занят");
     }
     _;}
     modifier CheckTheCorrectPassword(bytes32 password) {
         require(
             password != 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470,"Password incorrect");
-    _;}
-    modifier CheckLike (address Address, uint256 complaintsId) {
-        for (uint256 i=0; i<bookOfComplaintsAndSuggestions[Address][complaintsId].likes.length;i++) {
-            require(msg.sender != bookOfComplaintsAndSuggestions[Address][complaintsId].likes[i], "Вы уже оставили отметку 'Нравится'");
-        }
-    _;}
-        modifier CheckDislike (address Address, uint256 complaintsId) {
-        for (uint256 i=0; i<bookOfComplaintsAndSuggestions[Address][complaintsId].dislikes.length;i++) {
-            require(msg.sender != bookOfComplaintsAndSuggestions[Address][complaintsId].dislikes[i], "Вы уже оставили отметку 'Не понравилось'");
-        }
-    _;}
-    modifier CheckLikeComment(address Address, uint complaintsId, uint commentId) {
-        for (uint i=0;i<comments[Address][complaintsId][commentId].likes.length;i++) {
-            require(comments[Address][complaintsId][commentId].likes[i] != msg.sender, "Вы уже оставили отметку 'Нравится'");
-        }
-    _;}
-    modifier CheckDislikeComment(address Address, uint complaintsId, uint commentId) {
-        for (uint i=0;i<comments[Address][complaintsId][commentId].dislikes.length;i++) {
-            require(comments[Address][complaintsId][commentId].dislikes[i] != msg.sender, "Вы уже оставили отметку 'Нравится'");
-        }
     _;}
     modifier IsSalesmanOnThisShop(uint shopId) {
         if (user[msg.sender].role == 2) {
@@ -177,8 +161,5 @@ contract Shoping {
                 require(requestToAdmin[i].finish == true, "Вы уже отправили заявку");
             }
         }
-    _;}
-    modifier IsNotSenderComplaints(address Address, uint256 complaintsId) {
-        require(keccak256(abi.encodePacked(bookOfComplaintsAndSuggestions[Address][complaintsId].login)) != user[msg.sender].login, "Это ваш комментарий");
     _;}
 }

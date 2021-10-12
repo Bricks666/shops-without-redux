@@ -57,9 +57,13 @@ export const useComments = (shopAddress, CASId) => {
 
 	useEffect(() => {
 		const getComments = async () => {
-			const comments = await api.getComments(shopAddress, CASId);
+			try {
+				const comments = await api.getComments(shopAddress, CASId);
 
-			dispatch(setComments(comments.map(toValidComment)));
+				dispatch(setComments(comments.map(toValidComment)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getComments();

@@ -45,15 +45,19 @@ export const useFreeAddresses = () => {
 
 	useEffect(() => {
 		const getAddresses = async () => {
-			const addresses = await api.getFreeAddresses();
-			const validAddresses = [];
-			addresses.forEach((address, index) => {
-				if (addressIsNull(address) === false) {
-					validAddresses.push(toValidFreeAddress(address, index));
-				}
-			});
+			try {
+				const addresses = await api.getFreeAddresses();
+				const validAddresses = [];
+				addresses.forEach((address, index) => {
+					if (addressIsNull(address) === false) {
+						validAddresses.push(toValidFreeAddress(address, index));
+					}
+				});
 
-			dispatch(setAddresses(validAddresses));
+				dispatch(setAddresses(validAddresses));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getAddresses();

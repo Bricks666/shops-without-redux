@@ -5,11 +5,11 @@ import { hashing } from "../Services/hashing";
 let web3;
 let contract;
 let sender;
-window.sender = sender;
 
 export const api = {
 	initialWeb3() {
 		web3 = new Web3("ws://localhost:8545");
+		console.log(web3);
 		return true;
 	},
 	async connectContract() {
@@ -33,17 +33,22 @@ export const api = {
 	},
 	async login(login, password) {
 		const response = await contract.methods
-			.LogIn(hashing(login), hashing(password))
+			.LogIn(login, hashing(password))
 			.call({ from: sender });
 		return response;
 	},
 	async registration(fio, login, password) {
 		return await contract.methods
-			.regUser(fio, hashing(login), hashing(password))
+			.regUser(fio, login, hashing(password))
 			.send({ from: sender });
 	},
 	async getProfileInfo() {
 		return await contract.methods.user(sender).call();
+	},
+	async getShopProfileInfo() {
+		return await contract.methods
+			.shops(await contract.methods.AddressToShop(sender).call())
+			.call();
 	},
 	async getUserInfo(userAddress) {
 		return await contract.methods.user(userAddress).call();
@@ -58,7 +63,7 @@ export const api = {
 		return await contract.methods.AddressToShop(shopAddress).call();
 	},
 	async getShop(shopId) {
-		return await contract.methods.shop(shopId).call();
+		return await contract.methods.shops(shopId).call();
 	},
 	async removeShop(shopId) {
 		return await contract.methods
@@ -68,13 +73,7 @@ export const api = {
 	},
 	async addShop(freeAddressId, city, nameStore, login, password) {
 		return await contract.methods
-			.AddShop(
-				freeAddressId,
-				city,
-				nameStore,
-				hashing(login),
-				hashing(password)
-			)
+			.AddShop(freeAddressId, city, nameStore, login, hashing(password))
 			.send({ from: sender });
 	},
 	async getCAS(shopAddress) {
@@ -138,7 +137,11 @@ export const api = {
 		return await contract.methods.RequestToAdmin().send({ from: sender });
 	},
 	async beBuyerForever() {
-		return await contract.methods.RequestToShoper().send({ from: sender });
+		debugger;
+		return await contract.methods
+			.RequestToShoper()
+			.send({ from: sender })
+			.on("receipt", console.log);
 	},
 	async beSalesmanForever(shopId) {
 		return await contract.methods
@@ -202,6 +205,23 @@ export const api = {
 	},
 	async getBeAdminRequest(requestId) {
 		return await contract.methods.requestToAdmin(requestId).call();
+	},
+	async getShopRequestsId() {
+		return await contract.methods.GetBankRequestIndexes().call();
+	},
+	async acceptShopRequest(shopId) {
+		return await contract.methods.AccRequestBank(shopId).send({ from: sender });
+	},
+	async cancelShopRequest(shopId) {
+		return await contract.methods
+			.CancelRequestBank(shopId)
+			.send({ from: sender });
+	},
+	async requestBank() {
+		return await contract.methods.ToBankRequest().send({ from: sender });
+	},
+	async getBankRequest(shopId) {
+		return await contract.methods.BankRequestShop(shopId).call();
 	},
 	subscribeChangeRole(callback, filter) {
 		return contract.events.ChangeRole({ filter }, (error, { returnValues }) => {
@@ -319,7 +339,7 @@ export const api = {
 		return contract.events.RequestFinished(
 			{ filter },
 			(error, { returnValues }) => {
-        console.log(error, returnValues)
+				console.log(error, returnValues);
 				if (error === null) {
 					console.log(returnValues);
 					callback(returnValues);
@@ -329,7 +349,7 @@ export const api = {
 	},
 	subscribeNewRequest(callback, filter) {
 		return contract.events.NewRequest({ filter }, (error, { returnValues }) => {
-      console.log(error, returnValues)
+			console.log(error, returnValues);
 
 			if (error === null) {
 				console.log(returnValues);
@@ -338,5 +358,3 @@ export const api = {
 		});
 	},
 };
-
-window.api = api;

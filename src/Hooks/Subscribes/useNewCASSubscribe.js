@@ -5,9 +5,13 @@ import { toValidCAS } from "../../Services/toValidCAS";
 export const useNewCASSubscribe = (callback, filters = {}) => {
 	useEffect(() => {
 		const newCAS = async ({ Address: shopAddress, complaintsId: CASId }) => {
-			const CAS = await api.getCASById(shopAddress, CASId);
+			try {
+				const CAS = await api.getCASById(shopAddress, CASId);
 
-			callback(toValidCAS(CAS));
+				callback(toValidCAS(CAS));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		const subscribe = api.subscribeNewCAS(newCAS, filters);

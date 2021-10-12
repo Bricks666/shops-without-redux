@@ -15,9 +15,13 @@ export const useBeSalesmanRequestsList = () => {
 
 	useEffect(() => {
 		const getRequests = async () => {
-			const requests = await api.getBeSalesmanRequests();
+			try {
+				const requests = await api.getBeSalesmanRequests();
 
-			dispatch(setRequest(requests.map(toValidRequest)));
+				dispatch(setRequest(requests.map(toValidRequest)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getRequests();
@@ -25,16 +29,20 @@ export const useBeSalesmanRequestsList = () => {
 
 	useNewRequestSubscribe(
 		async ({ requestId }) => {
-			const request = await api.getBeSalesmanRequest(requestId);
+			try {
+				const request = await api.getBeSalesmanRequest(requestId);
 
-			dispatch(addRequest(toValidRequest(request)));
+				dispatch(addRequest(toValidRequest(request)));
+			} catch (e) {
+				console.log(e.message);
+			}
 		},
-		{ Name: "BeSalesman" }
+		{ typeCode: 2 }
 	);
 
 	useFinishRequestSubscribe(
-		({ requestId }) => dispatch(finishRequest(requestId)),
-		{ Name: "BeSalesman" }
+		({ requestId }) => dispatch(finishRequest(+requestId)),
+		{ typeCode: 2 }
 	);
 
 	return [state];

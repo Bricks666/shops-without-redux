@@ -6,8 +6,12 @@ export const useWalletsAddresses = () => {
 
 	useEffect(() => {
 		const getWallets = async () => {
-			const wallets = await api.getWalletsAddresses();
-			setWalletsAddresses(wallets);
+			try {
+				const wallets = await api.getWalletsAddresses();
+				setWalletsAddresses(wallets);
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getWallets();

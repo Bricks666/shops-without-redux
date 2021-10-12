@@ -9,6 +9,7 @@ import { Registration } from "../Registration/Registration";
 import { Button } from "../Shared/Button/Button";
 import { WalletEnter } from "../WalletEnter/WalletEnter";
 import "./App.css";
+import { SpecialButtons } from "./SpecialButtons";
 
 const App = (props) => {
 	const [isAppInitial] = useStartInitial();
@@ -17,6 +18,7 @@ const App = (props) => {
 
 	const [isLogin, setLogin] = useState(false);
 
+	const [isGuest, setGuest] = useState(false);
 	const [isRegistration, setRegistration] = useState(false);
 
 	const lockAccount = () => {
@@ -30,13 +32,12 @@ const App = (props) => {
 		);
 	}
 
-	console.log(isAppInitial, isUnlock, isRegistration, isLogin);
-
 	return (
 		<BrowserRouter>
 			<section>
 				<ContentRedirect
 					isUnlock={isUnlock}
+					isGuest={isGuest}
 					isLogin={isLogin}
 					isRegistration={isRegistration}
 				/>
@@ -45,22 +46,22 @@ const App = (props) => {
 						<WalletEnter unlock={unlock} />
 					</Route>
 					<Route path="/login">
-						<Login setLogin={setLogin} />
+						<Login setLogin={setLogin}/>
+						<Button onClick={() => setGuest(true)}>Войти как гость</Button>
 					</Route>
 					<Route path="/registration">
 						<Registration setRegistration={setRegistration} />
 					</Route>
 					<Route path="/">
-						<Content />
+						<Content isGuest={isGuest} />
 					</Route>
 				</Switch>
-				{isUnlock ? (
-					<Button className="lock-account-button" onClick={lockAccount}>
-						Сменить кошелек
-					</Button>
-				) : (
-					""
-				)}
+				<SpecialButtons
+					isUnlock={isUnlock}
+					isGuest={isGuest}
+					guestExit={() => setGuest(false)}
+					lockAccount={lockAccount}
+				/>
 			</section>
 		</BrowserRouter>
 	);

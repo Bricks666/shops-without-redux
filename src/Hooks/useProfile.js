@@ -73,18 +73,32 @@ export const useProfile = (throwUser) => {
 		let intervalId;
 
 		const getInfo = async () => {
-			const info = toValidProfile(await api.getProfileInfo());
-			info.balance = await api.getBalance();
+			try {
+				let info = await api.getProfileInfo();
+				info.balance = await api.getBalance();
+				if (+info.role === 6) {
+					info = {
+						...info,
+						...(await api.getShopProfileInfo()),
+					};
+				}
+				const validInfo = toValidProfile(info);
+				dispatch(setInfo(validInfo));
 
-			dispatch(setInfo(info));
-
-			throwUser(info);
-
-			intervalId = setInterval(async () => {
-				const newBalance = await api.getBalance();
-
-				dispatch(updateBalance(newBalance));
-			}, 1000);
+				throwUser(validInfo);
+				intervalId = setInterval(async () => {
+					try {
+						const newBalance = await api.getBalance();
+						if (+state.balance !== +newBalance) {
+							dispatch(updateBalance(+newBalance));
+						}
+					} catch (e) {
+						console.log(e.message);
+					}
+				}, 1000);
+			} catch (e) {
+				console.log(e.message);
+			}
 		};
 
 		getInfo();
